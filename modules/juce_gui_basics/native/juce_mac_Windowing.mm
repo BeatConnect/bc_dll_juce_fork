@@ -353,7 +353,12 @@ bool DragAndDropContainer::performExternalDragDropOfFiles (const StringArray& fi
     if (files.isEmpty())
         return false;
 
-    if (auto* view = getNSViewForDragEvent (sourceComponent))
+    // BEATCONNECT MODIFICATIONS START
+    NSArray *ar = [NSApp orderedWindows];
+    NSWindow *window = [ar objectAtIndex:0];
+    NSView *view = [window contentView];
+    //if (auto* view = getNSViewForDragEvent (sourceComponent))
+    // BEATCONNECT MODIFICATIONS END
     {
         JUCE_AUTORELEASEPOOL
         {
