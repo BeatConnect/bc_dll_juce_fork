@@ -26,6 +26,11 @@
 namespace juce
 {
 
+// BEATCONNECT MODIFICATION START
+// Allow the state reset by default.
+bool AudioPluginInstance::g_PerformStateReset = true;
+// BEATCONNECT MODIFICATION END
+
 PluginDescription AudioPluginInstance::getPluginDescription() const
 {
     PluginDescription desc;

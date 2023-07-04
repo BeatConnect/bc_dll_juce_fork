@@ -48,6 +48,14 @@ JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4996)
 class JUCE_API  AudioPluginInstance   : public AudioProcessor
 {
 public:
+
+    // BEATCONNECT MODIFICATION START
+    // When receiving a state change from Player 1, some plugins will reset the internal parameters to zero.
+    // This reset happens asynchronously. So, it is difficult to prevent this unwanted change to go to other players.
+    // We need to prevent the reset altogether.
+    static bool g_PerformStateReset;
+    // BEATCONNECT MODIFICATION START
+
     //==============================================================================
     /** Destructor.
 

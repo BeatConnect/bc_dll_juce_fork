@@ -3015,12 +3015,19 @@ public:
 
             if (editController != nullptr)
             {
-                if (componentStream != nullptr)
+                // BEATCONNECT MODIFICATION START
+                if (g_PerformStateReset)
                 {
-                    int64 result;
-                    componentStream->seek (0, IBStream::kIBSeekSet, &result);
-                    setComponentStateAndResetParameters (*componentStream);
+                // BEATCONNECT MODIFICATION END
+                    if (componentStream != nullptr)
+                    {
+                        int64 result;
+                        componentStream->seek(0, IBStream::kIBSeekSet, &result);
+                        setComponentStateAndResetParameters(*componentStream);
+                    }
+                // BEATCONNECT MODIFICATION START
                 }
+                // BEATCONNECT MODIFICATION END
 
                 auto controllerStream (createMemoryStreamForState (*head, "IEditController"));
 
