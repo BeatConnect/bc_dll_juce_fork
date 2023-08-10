@@ -245,6 +245,7 @@ public:
         peak
     };
     // BEATCONNECT MODIFICATION END
+
 };
 
 /**
