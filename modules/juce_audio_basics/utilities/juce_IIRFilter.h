@@ -232,19 +232,6 @@ class IIRFilter : public IIRFilterBase<SpinLock>
 {
 public:
     using IIRFilterBase::IIRFilterBase;
-    // BEATCONNECT MODIFICATION START
-    enum class FilterType {
-        noFilter = 0,
-        lowpass,
-        highpass,
-        bandpass,
-        notch,
-        allpass,
-        lowshelf,
-        highshelf,
-        peak
-    };
-    // BEATCONNECT MODIFICATION END
 };
 
 /**
