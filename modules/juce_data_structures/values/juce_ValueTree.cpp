@@ -460,6 +460,43 @@ public:
             return nullptr;
         }
 
+        // TEST
+        virtual bool isUndoBlocked()
+        {
+            DBG("SetPropertyAction");
+            ValueTree test(target);
+            jassert(test.isValid());
+
+            bool isBlocked = false;
+            if (test.hasProperty("TIMESIG"))
+                isBlocked = true;
+
+            return false; // test.hasProperty("toto");
+        }
+
+        virtual String dumpState() 
+        {
+            String dump("SetPropertyAction - ");
+
+            ValueTree test(target);
+            jassert(test.isValid());
+
+            if (test.isValid())
+                dump += test.getType().toString();
+            else
+                dump += "not valid";
+
+            dump += " ";
+
+            if (test.hasProperty("uuid"))
+                dump += "[" + test.getProperty("uuid").toString() + "]";
+            else
+                dump += "[no uuid]";
+
+            return dump;
+        }
+        // TEST
+
     private:
         const Ptr target;
         const Identifier name;
@@ -515,6 +552,38 @@ public:
             return (int) sizeof (*this); //xxx should be more accurate
         }
 
+        // TEST
+        virtual bool isUndoBlocked()
+        {
+            DBG("AddOrRemoveChildAction");
+            ValueTree test(child);
+            jassert(test.isValid());
+            return false; // test.hasProperty("toto");
+        }
+
+        virtual String dumpState()
+        {
+            String dump("AddOrRemoveChildAction - ");
+
+            ValueTree test(child);
+            jassert(test.isValid());
+
+            if (test.isValid())
+                dump += test.getType().toString();
+            else
+                dump += "not valid";
+
+            dump += " ";
+
+            if (test.hasProperty("uuid"))
+                dump += "[" + test.getProperty("uuid").toString() + "]";
+            else
+                dump += "[no uuid]";
+
+            return dump;
+        }
+        // TEST
+
     private:
         const Ptr target, child;
         const int childIndex;
@@ -556,6 +625,51 @@ public:
 
             return nullptr;
         }
+
+        // TEST
+        virtual bool isUndoBlocked() 
+        { 
+            DBG("MoveChildAction");
+            ValueTree test1(parent);
+            jassert(test1.isValid());
+            ValueTree test2 = test1.getChild(startIndex);
+            jassert(test2.isValid());
+
+            bool isBlocked = false;
+            if(test1.hasType("TRACK") && (test2.hasType("PLUGIN") || test2.hasType("OUTPUTDEVICES")))
+                isBlocked = true;
+
+            return isBlocked; // test2.hasProperty("toto");
+        }
+
+        virtual String dumpState()
+        {
+            String dump("MoveChildAction - parent: ");
+
+            ValueTree test1(parent);
+            if (test1.isValid())
+                dump += test1.getType().toString();
+            else
+                dump += "not valid";
+
+            dump += ", child: ";
+
+            ValueTree test2 = test1.getChild(startIndex);
+            if (test2.isValid())
+                dump += test2.getType().toString();
+            else
+                dump += "not valid";
+
+            dump += " ";
+
+            if (test2.hasProperty("uuid"))
+                dump += "[" + test2.getProperty("uuid").toString() + "]";
+            else
+                dump += "[no uuid]";
+
+            return dump;
+        }
+        // TEST
 
     private:
         const Ptr parent;

@@ -121,7 +121,7 @@ bool UndoManager::perform (UndoableAction* newAction)
             return false;
         }
 
-        if (action->perform())
+        if (action->perform()) // && !newAction->isUndoBlocked())
         {
             auto* actionSet = getCurrentSet();
 
@@ -364,6 +364,46 @@ int UndoManager::getNumActionsInCurrentTransaction() const
             return s->actions.size();
 
     return 0;
+}
+
+void UndoManager::dump()
+{
+    std::cout.clear();
+
+    DBG("---------------------------------------------");
+    std::cout << "---------------------------------------------" << '\n';
+
+    int i = 0;
+    int j = 0;
+    for (auto actionSet : transactions)
+    {
+        if (getCurrentSet() == actionSet)
+        {
+            DBG("[" << i << "] * transaction begin");
+            std::cout << "[" << i << "] * transaction begin" << '\n';
+        }
+        else
+        {
+            DBG("[" << i << "] transaction begin");
+            std::cout << "[" << i << "] transaction begin" << '\n';
+        }
+
+        i++;
+
+        for (auto action : actionSet->actions)
+        {
+            DBG("\t[" << j << "] - " << action->dumpState());
+            std::cout << "\t[" << j << "] - " << action->dumpState() << '\n';
+
+            j++;
+        }
+    }
+
+    if (i == 0)
+    {
+        DBG("Undo/Redo history is empty");
+        std::cout << "Undo/Redo history is empty" << '\n';
+    }
 }
 
 } // namespace juce
