@@ -232,7 +232,12 @@ void AudioDeviceManager::createAudioDeviceTypes (OwnedArray<AudioIODeviceType>& 
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_WASAPI (WASAPIDeviceMode::shared));
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_WASAPI (WASAPIDeviceMode::exclusive));
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_WASAPI (WASAPIDeviceMode::sharedLowLatency));
-    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_DirectSound());
+
+    // BEATCONNECT MODIFICATION START
+    // Task #1279. We don't want to support DirectSound.
+    // addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_DirectSound());
+    // BEATCONNECT MODIFICATION END
+
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ASIO());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_CoreAudio());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_iOSAudio());
