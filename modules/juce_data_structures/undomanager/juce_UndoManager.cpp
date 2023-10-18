@@ -121,7 +121,7 @@ bool UndoManager::perform (UndoableAction* newAction)
             return false;
         }
 
-        if (action->perform()) // && !newAction->isUndoBlocked())
+        if (action->perform())
         {
             auto* actionSet = getCurrentSet();
 
