@@ -110,7 +110,16 @@ bool UndoManager::perform (UndoableAction* newAction, const String& actionName)
 
 bool UndoManager::perform (UndoableAction* newAction)
 {
-    if (newAction != nullptr)
+    // BEATCONNECT MODIFICATION
+    // In order for the Undo/Redo to work in multiplayer, we need to know the last origin used.
+    // In essence, we want to ommit any addition to the Undo/Redo if comming from socket or equivalent.
+    bool doUndo = true;
+    if (m_LambdaVerifyMultiplayerInsertion != nullptr)
+        doUndo = m_LambdaVerifyMultiplayerInsertion();
+
+    // if (newAction != nullptr)
+    if (newAction != nullptr && doUndo)
+    // BEATCONNECT MODIFICATION
     {
         std::unique_ptr<UndoableAction> action (newAction);
 
@@ -121,7 +130,7 @@ bool UndoManager::perform (UndoableAction* newAction)
             return false;
         }
 
-        if (action->perform()) // && !newAction->isUndoBlocked())
+        if (action->perform())
         {
             auto* actionSet = getCurrentSet();
 
@@ -148,11 +157,25 @@ bool UndoManager::perform (UndoableAction* newAction)
             actionSet->actions.add (std::move (action));
             newTransaction = false;
 
-            moveFutureTransactionsToStash();
+            // BEATCONNECT MODIFICATION
+            // TODO: I'm not sure what this is used for or if it's important to BC.
+            //       However, it's causing the Undo/Redo to be emptied when it shouldn't.
+            //       I don't understand exactly why.
+            // moveFutureTransactionsToStash();
+            // BEATCONNECT MODIFICATION
+
             dropOldTransactionsIfTooLarge();
             sendChangeMessage();
             return true;
         }
+    }
+    else
+    {
+        // BEATCONNECT MODIFICATION
+        // TODO: Should be deleted but causes a crash at start up.
+        // delete newAction;
+        // newAction = nullptr;
+        // BEATCONNECT MODIFICATION
     }
 
     return false;
@@ -366,7 +389,7 @@ int UndoManager::getNumActionsInCurrentTransaction() const
     return 0;
 }
 
-void UndoManager::dump()
+void UndoManager::dumpHistory()
 {
     std::cout.clear();
 
@@ -404,6 +427,47 @@ void UndoManager::dump()
         DBG("Undo/Redo history is empty");
         std::cout << "Undo/Redo history is empty" << '\n';
     }
+}
+
+void UndoManager::syncAllUndoablesWithCurrentState()
+{
+    // Clean up this fucking mess.
+    // 
+    // TODO: Testing code. To be removed once Undo/Redo works.
+    // std::vector<ActionSet*> actionSetsToRemove;
+
+    for (auto actionSet : transactions)
+    {
+        // TODO: Testing code. To be removed once Undo/Redo works.
+        // std::vector<UndoableAction*> actionsToRemove;
+
+        for (auto action : actionSet->actions)
+        {
+            if (!action->syncWithEdit())
+            {
+                // TODO: Testing code. To be removed once Undo/Redo works.
+                // DBG("Removing undoable - " << action->dumpState());
+                // std::cout << "Removing undoable - " << action->dumpState() << '\n';
+                // actionsToRemove.push_back(action);
+            }
+        }
+
+        // TODO: Testing code. To be removed once Undo/Redo works.
+        // for(auto toRemove : actionsToRemove)
+        //     actionSet->actions.removeObject(toRemove);
+
+        // TODO: Testing code. To be removed once Undo/Redo works.
+        //  if (actionSet->actions.size() == 0)
+        //      actionSetsToRemove.push_back(actionSet);
+    }
+
+    // TODO: Testing code. To be removed once Undo/Redo works.
+    //  for (auto toRemove : actionSetsToRemove)
+    //  {
+    //      DBG("Removing action set");
+    //      transactions.removeObject(toRemove);
+    //      --nextIndex;
+    //  }
 }
 
 } // namespace juce

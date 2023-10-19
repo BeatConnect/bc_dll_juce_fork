@@ -246,7 +246,9 @@ public:
     bool isPerformingUndoRedo() const;
 
     // TEST
-    void dump();
+    void dumpHistory();
+    void syncAllUndoablesWithCurrentState();
+    std::function<bool()> m_LambdaVerifyMultiplayerInsertion;
     // TEST
 
 private:

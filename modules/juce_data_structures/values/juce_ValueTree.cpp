@@ -327,7 +327,11 @@ public:
                 if (! isPositiveAndBelow (newIndex, children.size()))
                     newIndex = children.size() - 1;
 
-                undoManager->perform (new MoveChildAction (*this, currentIndex, newIndex));
+                // BEATCONNECT MODIFICATION
+                // TODO: Although I'm not sure why, this need to be commented out for the multiplayer Undo/Redo to work properly.
+                //       Something to do with multiplayer cross contamination.
+                // undoManager->perform (new MoveChildAction (*this, currentIndex, newIndex));
+                // BEATCONNECT MODIFICATION
             }
         }
     }
@@ -460,19 +464,19 @@ public:
             return nullptr;
         }
 
-        // TEST
-        virtual bool isUndoBlocked()
-        {
-            DBG("SetPropertyAction");
-            ValueTree test(target);
-            jassert(test.isValid());
-
-            bool isBlocked = false;
-            if (test.hasProperty("TIMESIG"))
-                isBlocked = true;
-
-            return false; // test.hasProperty("toto");
-        }
+        // BEATCONNECT MODIFICATION
+        //  virtual bool isUndoBlocked()
+        //  {
+        //      DBG("SetPropertyAction");
+        //      ValueTree test(target);
+        //      jassert(test.isValid());
+        //  
+        //      bool isBlocked = false;
+        //      if (test.hasProperty("TIMESIG"))
+        //          isBlocked = true;
+        //  
+        //      return false; // test.hasProperty("toto");
+        //  }
 
         virtual String dumpState() 
         {
@@ -488,14 +492,27 @@ public:
 
             dump += " ";
 
-            if (test.hasProperty("uuid"))
+            if (test.hasProperty("uuid") && test.getProperty("uuid").toString().isNotEmpty())
                 dump += "[" + test.getProperty("uuid").toString() + "]";
             else
                 dump += "[no uuid]";
 
             return dump;
         }
-        // TEST
+
+        bool syncWithEdit() override
+        {
+            ValueTree targetVT(target);
+
+            if (!targetVT.getParent().isValid())
+            {
+                DBG("Parent not valid - " << dumpState());
+                std::cout << "Parent not valid - " << dumpState() << '\n';
+            }
+
+            return targetVT.getParent().isValid();
+        }
+        // BEATCONNECT MODIFICATION
 
     private:
         const Ptr target;
@@ -552,14 +569,14 @@ public:
             return (int) sizeof (*this); //xxx should be more accurate
         }
 
-        // TEST
-        virtual bool isUndoBlocked()
-        {
-            DBG("AddOrRemoveChildAction");
-            ValueTree test(child);
-            jassert(test.isValid());
-            return false; // test.hasProperty("toto");
-        }
+        // BEATCONNECT MODIFICATION
+        //  virtual bool isUndoBlocked()
+        //  {
+        //      DBG("AddOrRemoveChildAction");
+        //      ValueTree test(child);
+        //      jassert(test.isValid());
+        //      return false; // test.hasProperty("toto");
+        //  }
 
         virtual String dumpState()
         {
@@ -575,18 +592,52 @@ public:
 
             dump += " ";
 
-            if (test.hasProperty("uuid"))
+            if (test.hasProperty("uuid") && test.getProperty("uuid").toString().isNotEmpty())
                 dump += "[" + test.getProperty("uuid").toString() + "]";
             else
                 dump += "[no uuid]";
 
             return dump;
         }
-        // TEST
+
+        bool syncWithEdit() override 
+        {
+            bool result = false;
+
+            ValueTree parentVT(target);
+            ValueTree childVT(child);
+            if (parentVT.isValid() && childVT.isValid())
+            {
+                for (int i = 0; i < parentVT.getNumChildren(); i++)
+                {
+                    if (parentVT.getChild(i) == childVT)
+                    {
+                        result = true;
+
+                        if (childIndex != i)
+                        {
+                            DBG("Index update, " << childIndex << " to " << i << " - " << dumpState());
+                            std::cout << "Index update, " << childIndex << " to " << i << " - " << dumpState() << '\n';
+                        }
+
+                        childIndex = i != childIndex ? i : childIndex;
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
+        // BEATCONNECT MODIFICATION
 
     private:
         const Ptr target, child;
-        const int childIndex;
+
+        // BEATCONNECT MODIFICATION
+        // const int childIndex;
+        int childIndex;
+        // BEATCONNECT MODIFICATION
+
         const bool isDeleting;
 
         JUCE_DECLARE_NON_COPYABLE (AddOrRemoveChildAction)
@@ -626,7 +677,7 @@ public:
             return nullptr;
         }
 
-        // TEST
+        // BEATCONNECT MODIFICATION
         virtual bool isUndoBlocked() 
         { 
             DBG("MoveChildAction");
@@ -662,14 +713,14 @@ public:
 
             dump += " ";
 
-            if (test2.hasProperty("uuid"))
+            if (test2.hasProperty("uuid") && test2.getProperty("uuid").toString().isNotEmpty())
                 dump += "[" + test2.getProperty("uuid").toString() + "]";
             else
                 dump += "[no uuid]";
 
             return dump;
         }
-        // TEST
+        // BEATCONNECT MODIFICATION
 
     private:
         const Ptr parent;

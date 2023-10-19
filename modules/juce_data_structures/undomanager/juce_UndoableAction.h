@@ -97,8 +97,9 @@ public:
     virtual UndoableAction* createCoalescedAction (UndoableAction* nextAction)  { ignoreUnused (nextAction); return nullptr; }
 
     // TEST
-    virtual bool isUndoBlocked() { return false; }
+    // virtual bool isUndoBlocked() { return false; }
     virtual String dumpState() { return ""; }
+    virtual bool syncWithEdit() { return true; }
     // TEST
 };
 
