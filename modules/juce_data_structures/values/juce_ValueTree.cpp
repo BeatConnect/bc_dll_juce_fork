@@ -422,6 +422,11 @@ public:
               isAddingNewProperty (isAdding), isDeletingProperty (isDeleting),
               excludeListener (listenerToExclude)
         {
+            // BEATCONNECT MODIFICATION START
+            ValueTree targetVT(target);
+            m_TargetUUID = targetVT.getProperty("uuid");
+            jassert(m_TargetUUID.isNotEmpty());
+            // BEATCONNECT MODIFICATION END
         }
 
         bool perform() override
@@ -464,20 +469,7 @@ public:
             return nullptr;
         }
 
-        // BEATCONNECT MODIFICATION
-        //  virtual bool isUndoBlocked()
-        //  {
-        //      DBG("SetPropertyAction");
-        //      ValueTree test(target);
-        //      jassert(test.isValid());
-        //  
-        //      bool isBlocked = false;
-        //      if (test.hasProperty("TIMESIG"))
-        //          isBlocked = true;
-        //  
-        //      return false; // test.hasProperty("toto");
-        //  }
-
+        // BEATCONNECT MODIFICATION START
         virtual String dumpState() 
         {
             String dump("SetPropertyAction - ");
@@ -500,27 +492,41 @@ public:
             return dump;
         }
 
-        bool syncWithEdit() override
+        bool verifyValidity() override
         {
             ValueTree targetVT(target);
-
-            if (!targetVT.getParent().isValid())
-            {
-                DBG("Parent not valid - " << dumpState());
-                std::cout << "Parent not valid - " << dumpState() << '\n';
-            }
-
             return targetVT.getParent().isValid();
+        }    
+        
+        String getTargetUUID()
+        { 
+            return m_TargetUUID;
         }
-        // BEATCONNECT MODIFICATION
+
+        void resetTarget(ValueTree& p_TargetNode)
+        {
+            jassert(p_TargetNode.isValid());
+            target = p_TargetNode.getSharedObject();
+        }
+        // BEATCONNECT MODIFICATION END
 
     private:
-        const Ptr target;
+
+        // BEATCONNECT MODIFICATION START
+        // Remove the const since we now need to modify the target do to player 2's actions.
+        // const Ptr target;
+        Ptr target;
+        // BEATCONNECT MODIFICATION END
+
         const Identifier name;
         const var newValue;
         var oldValue;
         const bool isAddingNewProperty : 1, isDeletingProperty : 1;
         ValueTree::Listener* excludeListener;
+
+        // BEATCONNECT MODIFICATION START
+        String m_TargetUUID;
+        // BEATCONNECT MODIFICATION END
 
         JUCE_DECLARE_NON_COPYABLE (SetPropertyAction)
     };
@@ -535,6 +541,15 @@ public:
               isDeleting (newChild == nullptr)
         {
             jassert (child != nullptr);
+
+            // BEATCONNECT MODIFICATION START
+            ValueTree parentVT(target);
+            ValueTree childVT(child);
+            m_TargetUUID = parentVT.getProperty("uuid");
+            m_ChildUUID = childVT.getProperty("uuid");
+            jassert(m_TargetUUID.isNotEmpty());
+            jassert(m_ChildUUID.isNotEmpty());
+            // BEATCONNECT MODIFICATION END
         }
 
         bool perform() override
@@ -569,15 +584,7 @@ public:
             return (int) sizeof (*this); //xxx should be more accurate
         }
 
-        // BEATCONNECT MODIFICATION
-        //  virtual bool isUndoBlocked()
-        //  {
-        //      DBG("AddOrRemoveChildAction");
-        //      ValueTree test(child);
-        //      jassert(test.isValid());
-        //      return false; // test.hasProperty("toto");
-        //  }
-
+        // BEATCONNECT MODIFICATION START
         virtual String dumpState()
         {
             String dump("AddOrRemoveChildAction - ");
@@ -600,43 +607,88 @@ public:
             return dump;
         }
 
-        bool syncWithEdit() override 
+        bool verifyValidity() override
         {
-            bool result = false;
+            //  bool result = false;
+            //  
+            //  ValueTree parentVT(target);
+            //  if (!parentVT.isValid())
+            //      DBG("Parent not valid - " << dumpState());
+            //  
+            //  ValueTree childVT(child);
+            //  if (!parentVT.isValid())
+            //      DBG("Child not valid - " << dumpState());
+            //  
+            //  if (parentVT.isValid() && childVT.isValid())
+            //  {
+            //      for (int i = 0; i < parentVT.getNumChildren(); i++)
+            //      {
+            //          if (parentVT.getChild(i) == childVT)
+            //          {
+            //              result = true;
+            //  
+            //              if (childIndex != i)
+            //              {
+            //                  DBG("Index update, " << childIndex << " to " << i << " - " << dumpState());
+            //                  std::cout << "Index update, " << childIndex << " to " << i << " - " << dumpState() << '\n';
+            //              }
+            //  
+            //              childIndex = i != childIndex ? i : childIndex;
+            //              break;
+            //          }
+            //      }
+            //  }
+            //  
+            //  return result;
 
             ValueTree parentVT(target);
             ValueTree childVT(child);
-            if (parentVT.isValid() && childVT.isValid())
+            return parentVT.isValid() && childVT.isValid();
+        }
+
+        String getTargetUUID()
+        {
+            return m_TargetUUID;
+        }
+
+        void resetTarget(ValueTree& p_TargetNode)
+        {
+            jassert(m_ChildUUID.isNotEmpty());
+            jassert(p_TargetNode.isValid());
+            target = p_TargetNode.getSharedObject();
+            ValueTree parentVT(target);
+            for (int i = 0; i < parentVT.getNumChildren(); i++)
             {
-                for (int i = 0; i < parentVT.getNumChildren(); i++)
+                ValueTree childVT = parentVT.getChild(i);
+                if (childVT.getProperty("uuid") == m_ChildUUID)
                 {
-                    if (parentVT.getChild(i) == childVT)
+                    child = childVT.getSharedObject();
+            
+                    if (childIndex != i)
                     {
-                        result = true;
-
-                        if (childIndex != i)
-                        {
-                            DBG("Index update, " << childIndex << " to " << i << " - " << dumpState());
-                            std::cout << "Index update, " << childIndex << " to " << i << " - " << dumpState() << '\n';
-                        }
-
-                        childIndex = i != childIndex ? i : childIndex;
-                        break;
+                        DBG("Index update, " << childIndex << " to " << i << " - " << dumpState());
+                        std::cout << "Index update, " << childIndex << " to " << i << " - " << dumpState() << '\n';
                     }
+            
+                    childIndex = (i != childIndex ? i : childIndex);
+
+                    break;
                 }
             }
-
-            return result;
         }
-        // BEATCONNECT MODIFICATION
+        // BEATCONNECT MODIFICATION END
 
     private:
-        const Ptr target, child;
 
-        // BEATCONNECT MODIFICATION
+        // BEATCONNECT MODIFICATION START
+        // Remove the const since we now need to modify the target do to player 2's actions.
+        // const Ptr target, child;
         // const int childIndex;
+        Ptr target, child;
         int childIndex;
-        // BEATCONNECT MODIFICATION
+        String m_TargetUUID;
+        String m_ChildUUID;
+        // BEATCONNECT MODIFICATION END
 
         const bool isDeleting;
 
@@ -676,51 +728,6 @@ public:
 
             return nullptr;
         }
-
-        // BEATCONNECT MODIFICATION
-        virtual bool isUndoBlocked() 
-        { 
-            DBG("MoveChildAction");
-            ValueTree test1(parent);
-            jassert(test1.isValid());
-            ValueTree test2 = test1.getChild(startIndex);
-            jassert(test2.isValid());
-
-            bool isBlocked = false;
-            if(test1.hasType("TRACK") && (test2.hasType("PLUGIN") || test2.hasType("OUTPUTDEVICES")))
-                isBlocked = true;
-
-            return isBlocked; // test2.hasProperty("toto");
-        }
-
-        virtual String dumpState()
-        {
-            String dump("MoveChildAction - parent: ");
-
-            ValueTree test1(parent);
-            if (test1.isValid())
-                dump += test1.getType().toString();
-            else
-                dump += "not valid";
-
-            dump += ", child: ";
-
-            ValueTree test2 = test1.getChild(startIndex);
-            if (test2.isValid())
-                dump += test2.getType().toString();
-            else
-                dump += "not valid";
-
-            dump += " ";
-
-            if (test2.hasProperty("uuid") && test2.getProperty("uuid").toString().isNotEmpty())
-                dump += "[" + test2.getProperty("uuid").toString() + "]";
-            else
-                dump += "[no uuid]";
-
-            return dump;
-        }
-        // BEATCONNECT MODIFICATION
 
     private:
         const Ptr parent;

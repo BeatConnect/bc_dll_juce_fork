@@ -389,6 +389,7 @@ int UndoManager::getNumActionsInCurrentTransaction() const
     return 0;
 }
 
+// BEATCONNECT MODIFICATION START
 void UndoManager::dumpHistory()
 {
     std::cout.clear();
@@ -432,42 +433,15 @@ void UndoManager::dumpHistory()
 void UndoManager::syncAllUndoablesWithCurrentState()
 {
     // Clean up this fucking mess.
-    // 
-    // TODO: Testing code. To be removed once Undo/Redo works.
-    // std::vector<ActionSet*> actionSetsToRemove;
-
     for (auto actionSet : transactions)
     {
-        // TODO: Testing code. To be removed once Undo/Redo works.
-        // std::vector<UndoableAction*> actionsToRemove;
-
         for (auto action : actionSet->actions)
         {
-            if (!action->syncWithEdit())
-            {
-                // TODO: Testing code. To be removed once Undo/Redo works.
-                // DBG("Removing undoable - " << action->dumpState());
-                // std::cout << "Removing undoable - " << action->dumpState() << '\n';
-                // actionsToRemove.push_back(action);
-            }
+            if (!action->verifyValidity() && m_LambdaUpdateUndoable != nullptr)
+                m_LambdaUpdateUndoable(action);
         }
-
-        // TODO: Testing code. To be removed once Undo/Redo works.
-        // for(auto toRemove : actionsToRemove)
-        //     actionSet->actions.removeObject(toRemove);
-
-        // TODO: Testing code. To be removed once Undo/Redo works.
-        //  if (actionSet->actions.size() == 0)
-        //      actionSetsToRemove.push_back(actionSet);
     }
-
-    // TODO: Testing code. To be removed once Undo/Redo works.
-    //  for (auto toRemove : actionSetsToRemove)
-    //  {
-    //      DBG("Removing action set");
-    //      transactions.removeObject(toRemove);
-    //      --nextIndex;
-    //  }
 }
+// BEATCONNECT MODIFICATION END
 
 } // namespace juce

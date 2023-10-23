@@ -245,11 +245,12 @@ public:
     /** Returns true if the caller code is in the middle of an undo or redo action. */
     bool isPerformingUndoRedo() const;
 
-    // TEST
+    // BEATCONNECT MODIFICATION START
     void dumpHistory();
     void syncAllUndoablesWithCurrentState();
     std::function<bool()> m_LambdaVerifyMultiplayerInsertion;
-    // TEST
+    std::function<void(UndoableAction*)> m_LambdaUpdateUndoable;
+    // BEATCONNECT MODIFICATION END
 
 private:
     //==============================================================================

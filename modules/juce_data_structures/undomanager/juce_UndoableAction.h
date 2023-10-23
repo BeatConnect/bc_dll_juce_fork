@@ -23,9 +23,9 @@
   ==============================================================================
 */
 
+
 namespace juce
 {
-
 //==============================================================================
 /**
     Used by the UndoManager class to store an action which can be done
@@ -35,6 +35,11 @@ namespace juce
 
     @tags{DataStructures}
 */
+
+// BEATCONNECT MODIFICATION START
+class ValueTree;
+// BEATCONNECT MODIFICATION END
+
 class JUCE_API  UndoableAction
 {
 protected:
@@ -96,11 +101,12 @@ public:
     */
     virtual UndoableAction* createCoalescedAction (UndoableAction* nextAction)  { ignoreUnused (nextAction); return nullptr; }
 
-    // TEST
-    // virtual bool isUndoBlocked() { return false; }
+    // BEATCONNECT MODIFICATION START
     virtual String dumpState() { return ""; }
-    virtual bool syncWithEdit() { return true; }
-    // TEST
+    virtual bool verifyValidity() { return true; }
+    virtual String getTargetUUID() { return ""; }
+    virtual void resetTarget(juce::ValueTree& p_TargetNode) { p_TargetNode; }
+    // BEATCONNECT MODIFICATION END
 };
 
 } // namespace juce

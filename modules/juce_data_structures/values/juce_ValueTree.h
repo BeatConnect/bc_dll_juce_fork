@@ -640,6 +640,16 @@ private:
 
     explicit ValueTree (ReferenceCountedObjectPtr<SharedObject>) noexcept;
     explicit ValueTree (SharedObject&) noexcept;
+
+// BEATCONNECT MODIFICATION START
+public:
+
+    SharedObject* getSharedObject()
+    {
+        return object.get();
+    }
+
+// BEATCONNECT MODIFICATION END
 };
 
 } // namespace juce
