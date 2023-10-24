@@ -102,6 +102,7 @@ public:
     virtual UndoableAction* createCoalescedAction (UndoableAction* nextAction)  { ignoreUnused (nextAction); return nullptr; }
 
     // BEATCONNECT MODIFICATION START
+    virtual void test() {}
     virtual String dumpState() { return ""; }
     virtual bool verifyValidity() { return true; }
     virtual String getTargetUUID() { return ""; }

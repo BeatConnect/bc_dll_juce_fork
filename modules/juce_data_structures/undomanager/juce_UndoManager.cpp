@@ -121,6 +121,8 @@ bool UndoManager::perform (UndoableAction* newAction)
     if (newAction != nullptr && doUndo)
     // BEATCONNECT MODIFICATION
     {
+        newAction->test();
+
         std::unique_ptr<UndoableAction> action (newAction);
 
         if (isPerformingUndoRedo())

@@ -492,6 +492,13 @@ public:
             return dump;
         }
 
+        void test() override
+        {
+            ValueTree targetVT(target);
+            if (targetVT.hasType("PLUGIN"))
+                DBG("");
+        }
+
         bool verifyValidity() override
         {
             ValueTree targetVT(target);
@@ -543,12 +550,10 @@ public:
             jassert (child != nullptr);
 
             // BEATCONNECT MODIFICATION START
-            ValueTree parentVT(target);
-            ValueTree childVT(child);
+            const ValueTree parentVT(target);
+            const ValueTree childVT(child);
             m_TargetUUID = parentVT.getProperty("uuid");
-            m_ChildUUID = childVT.getProperty("uuid");
             jassert(m_TargetUUID.isNotEmpty());
-            jassert(m_ChildUUID.isNotEmpty());
             // BEATCONNECT MODIFICATION END
         }
 
@@ -589,7 +594,7 @@ public:
         {
             String dump("AddOrRemoveChildAction - ");
 
-            ValueTree test(child);
+            const ValueTree test(child);
             jassert(test.isValid());
 
             if (test.isValid())
@@ -607,43 +612,32 @@ public:
             return dump;
         }
 
+        void test() override
+        {
+            ValueTree targetVT(target);
+            if (targetVT.hasType("PLUGIN"))
+                DBG("");
+        }
+
         bool verifyValidity() override
         {
-            //  bool result = false;
-            //  
-            //  ValueTree parentVT(target);
-            //  if (!parentVT.isValid())
-            //      DBG("Parent not valid - " << dumpState());
-            //  
-            //  ValueTree childVT(child);
-            //  if (!parentVT.isValid())
-            //      DBG("Child not valid - " << dumpState());
-            //  
-            //  if (parentVT.isValid() && childVT.isValid())
-            //  {
-            //      for (int i = 0; i < parentVT.getNumChildren(); i++)
-            //      {
-            //          if (parentVT.getChild(i) == childVT)
-            //          {
-            //              result = true;
-            //  
-            //              if (childIndex != i)
-            //              {
-            //                  DBG("Index update, " << childIndex << " to " << i << " - " << dumpState());
-            //                  std::cout << "Index update, " << childIndex << " to " << i << " - " << dumpState() << '\n';
-            //              }
-            //  
-            //              childIndex = i != childIndex ? i : childIndex;
-            //              break;
-            //          }
-            //      }
-            //  }
-            //  
-            //  return result;
-
-            ValueTree parentVT(target);
-            ValueTree childVT(child);
-            return parentVT.isValid() && childVT.isValid();
+            bool isValid = false;
+            
+            const ValueTree parentVT(target);
+            const ValueTree childVT(child);
+            if (parentVT.isValid() && childVT.isValid())
+            {
+                for (int i = 0; i < parentVT.getNumChildren(); i++)
+                {
+                    if (parentVT.getChild(i) == childVT)
+                    {
+                        isValid = (childIndex == i);
+                        break;
+                    }
+                }
+            }
+            
+            return isValid;
         }
 
         String getTargetUUID()
@@ -653,16 +647,23 @@ public:
 
         void resetTarget(ValueTree& p_TargetNode)
         {
-            jassert(m_ChildUUID.isNotEmpty());
             jassert(p_TargetNode.isValid());
             target = p_TargetNode.getSharedObject();
-            ValueTree parentVT(target);
+            const ValueTree parentVT(target);
+            const ValueTree childVTOld(child);
             for (int i = 0; i < parentVT.getNumChildren(); i++)
             {
-                ValueTree childVT = parentVT.getChild(i);
-                if (childVT.getProperty("uuid") == m_ChildUUID)
+                ValueTree childVTNew = parentVT.getChild(i);
+
+                //  if (parentVT.hasType("TRACK"))
+                //  {
+                //      DBG("[" << i << "] - " << childVTNew.getType().toString() << ", " << childVTNew.getProperty("uuid").toString());
+                //      std::cout << "[" << i << "] - " << childVTNew.getType().toString() << ", " << childVTNew.getProperty("uuid").toString() << '\n';
+                //  }
+
+                if (childVTNew == childVTOld)
                 {
-                    child = childVT.getSharedObject();
+                    child = childVTNew.getSharedObject();
             
                     if (childIndex != i)
                     {
@@ -687,7 +688,6 @@ public:
         Ptr target, child;
         int childIndex;
         String m_TargetUUID;
-        String m_ChildUUID;
         // BEATCONNECT MODIFICATION END
 
         const bool isDeleting;
