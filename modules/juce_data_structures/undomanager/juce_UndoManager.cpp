@@ -366,6 +366,8 @@ int UndoManager::getNumActionsInCurrentTransaction() const
     return 0;
 }
 
+// BEATCONNECT MODIFICATION START
+// TODO: For debug. Work in progress. Used for dumping undo/redo history.
 void UndoManager::dump()
 {
     std::cout.clear();
@@ -405,5 +407,6 @@ void UndoManager::dump()
         std::cout << "Undo/Redo history is empty" << '\n';
     }
 }
+// BEATCONNECT MODIFICATION END
 
 } // namespace juce

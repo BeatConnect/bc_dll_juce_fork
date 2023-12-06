@@ -96,9 +96,10 @@ public:
     */
     virtual UndoableAction* createCoalescedAction (UndoableAction* nextAction)  { ignoreUnused (nextAction); return nullptr; }
 
-    // TEST
+    // BEATCONNECT MODIFICATION START
+    // TODO: For debug. Work in progress. Used for dumping undo/redo history.
     virtual String dumpState() { return ""; }
-    // TEST
+    // BEATCONNECT MODIFICATION END
 };
 
 } // namespace juce
