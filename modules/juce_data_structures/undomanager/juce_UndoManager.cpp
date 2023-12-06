@@ -366,4 +366,47 @@ int UndoManager::getNumActionsInCurrentTransaction() const
     return 0;
 }
 
+// BEATCONNECT MODIFICATION START
+// TODO: For debug. Work in progress. Used for dumping undo/redo history.
+void UndoManager::dump()
+{
+    std::cout.clear();
+
+    DBG("---------------------------------------------");
+    std::cout << "---------------------------------------------" << '\n';
+
+    int i = 0;
+    int j = 0;
+    for (auto actionSet : transactions)
+    {
+        if (getCurrentSet() == actionSet)
+        {
+            DBG("[" << i << "] * transaction begin");
+            std::cout << "[" << i << "] * transaction begin" << '\n';
+        }
+        else
+        {
+            DBG("[" << i << "] transaction begin");
+            std::cout << "[" << i << "] transaction begin" << '\n';
+        }
+
+        i++;
+
+        for (auto action : actionSet->actions)
+        {
+            DBG("\t[" << j << "] - " << action->dumpState());
+            std::cout << "\t[" << j << "] - " << action->dumpState() << '\n';
+
+            j++;
+        }
+    }
+
+    if (i == 0)
+    {
+        DBG("Undo/Redo history is empty");
+        std::cout << "Undo/Redo history is empty" << '\n';
+    }
+}
+// BEATCONNECT MODIFICATION END
+
 } // namespace juce

@@ -95,6 +95,11 @@ public:
         If it's not possible to merge the two actions, the method should return a nullptr.
     */
     virtual UndoableAction* createCoalescedAction (UndoableAction* nextAction)  { ignoreUnused (nextAction); return nullptr; }
+
+    // BEATCONNECT MODIFICATION START
+    // TODO: For debug. Work in progress. Used for dumping undo/redo history.
+    virtual String dumpState() { return ""; }
+    // BEATCONNECT MODIFICATION END
 };
 
 } // namespace juce

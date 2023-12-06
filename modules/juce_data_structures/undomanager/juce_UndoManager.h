@@ -245,6 +245,11 @@ public:
     /** Returns true if the caller code is in the middle of an undo or redo action. */
     bool isPerformingUndoRedo() const;
 
+    // BEATCONNECT MODIFICATION START
+    // TODO: For debug. Work in progress. Used for dumping undo/redo history.
+    void dump();
+    // BEATCONNECT MODIFICATION END
+
 private:
     //==============================================================================
     struct ActionSet;
