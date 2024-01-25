@@ -54,7 +54,7 @@ public:
     // This reset happens asynchronously. So, it is difficult to prevent this unwanted change to go to other players.
     // We need to prevent the reset altogether.
     static bool g_PerformStateReset;
-    // BEATCONNECT MODIFICATION START
+    // BEATCONNECT MODIFICATION END
 
     //==============================================================================
     /** Destructor.
