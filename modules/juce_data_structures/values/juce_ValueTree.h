@@ -25,6 +25,18 @@
 
 namespace juce
 {
+    // BEATCONNECT MODIFICATION START
+    // TODO: The one and only Identifier used for notifying the DLL that the uuids need to be reset.
+    //       This is used in ValueTree::createCopy() so we don't end up with duplicate uuids. 
+    //       I don't like to modify tracktion or juce. However, I can't find a way around it
+    //       as there are copies done within tracktion as well as the DLL.
+    namespace IDs
+    {
+        #define DECLARE_ID(name) const juce::Identifier name (#name);
+        DECLARE_ID(uuidReset)
+        #undef DECLARE_ID
+    }
+    // BEATCONNECT MODIFICATION END
 
 //==============================================================================
 /**
@@ -174,7 +186,11 @@ public:
     bool isValid() const noexcept                           { return object != nullptr; }
 
     /** Returns a deep copy of this tree and all its sub-trees. */
-    ValueTree createCopy() const;
+    // BEATCONNECT MODIFICATION START
+    // Set uuidReset to true if a uuid reset is require. This will be performed DLL side.
+    ValueTree createCopy(const bool uuidReset = false) const;
+    // ValueTree createCopy() const;
+    // BEATCONNECT MODIFICATION END
 
     /** Overwrites all the properties in this tree with the properties of the source tree.
         Any properties that already exist will be updated; and new ones will be added, and

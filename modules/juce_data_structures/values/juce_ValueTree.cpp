@@ -657,13 +657,26 @@ bool ValueTree::isEquivalentTo (const ValueTree& other) const
                  && object->isEquivalentTo (*other.object));
 }
 
-ValueTree ValueTree::createCopy() const
+// BEATCONNECT MODIFICATION START
+ValueTree ValueTree::createCopy(const bool uuidReset) const
 {
+    // TODO: Will this impact undo/redo? Might need to pass a bool parameter.
     if (object != nullptr)
-        return ValueTree (*new SharedObject (*object));
+    {
+        ValueTree temp(*new SharedObject(*object));
+        if(uuidReset)
+            temp.setProperty(IDs::uuidReset, true, nullptr);
+        return temp;
+    }
 
     return {};
+
+    //  if (object != nullptr)
+    //      return ValueTree (*new SharedObject (*object));
+    //  
+    //  return {};
 }
+// BEATCONNECT MODIFICATION END
 
 void ValueTree::copyPropertiesFrom (const ValueTree& source, UndoManager* undoManager)
 {
