@@ -170,7 +170,13 @@ MidiMessage::MidiMessage (const int byte1, const int byte2, const int byte3, con
 }
 
 MidiMessage::MidiMessage (const MidiMessage& other)
-   : timeStamp (other.timeStamp), size (other.size)
+: timeStamp (other.timeStamp)
+, size (other.size)
+// BEATCONNECT MODIFICATION START
+// Used for note animation
+, timeInClip(other.timeInClip)
+, editItemID(other.editItemID)
+// BEATCONNECT MODIFICATION END
 {
     if (isHeapAllocated())
         memcpy (allocateSpace (size), other.getData(), (size_t) size);
@@ -179,7 +185,13 @@ MidiMessage::MidiMessage (const MidiMessage& other)
 }
 
 MidiMessage::MidiMessage (const MidiMessage& other, const double newTimeStamp)
-   : timeStamp (newTimeStamp), size (other.size)
+: timeStamp (newTimeStamp)
+, size (other.size)
+// BEATCONNECT MODIFICATION START
+// Used for note animation
+, timeInClip(other.timeInClip)
+, editItemID(other.editItemID)
+// BEATCONNECT MODIFICATION END
 {
     if (isHeapAllocated())
         memcpy (allocateSpace (size), other.getData(), (size_t) size);
@@ -307,13 +319,25 @@ MidiMessage& MidiMessage::operator= (const MidiMessage& other)
 
         timeStamp = other.timeStamp;
         size = other.size;
+
+        // BEATCONNECT MODIFICATION START
+        // Used for note animation
+        timeInClip = other.timeInClip;
+        editItemID = other.editItemID;
+        // BEATCONNECT MODIFICATION END
     }
 
     return *this;
 }
 
 MidiMessage::MidiMessage (MidiMessage&& other) noexcept
-   : timeStamp (other.timeStamp), size (other.size)
+: timeStamp (other.timeStamp)
+, size (other.size)
+// BEATCONNECT MODIFICATION START
+// Used for note animation
+, timeInClip(other.timeInClip)
+, editItemID(other.editItemID)
+// BEATCONNECT MODIFICATION END
 {
     packedData.allocatedData = other.packedData.allocatedData;
     other.size = 0;
@@ -324,6 +348,13 @@ MidiMessage& MidiMessage::operator= (MidiMessage&& other) noexcept
     packedData.allocatedData = other.packedData.allocatedData;
     timeStamp = other.timeStamp;
     size = other.size;
+
+    // BEATCONNECT MODIFICATION START
+    // Used for note animation
+    timeInClip = other.timeInClip;
+    editItemID = other.editItemID;
+    // BEATCONNECT MODIFICATION END
+
     other.size = 0;
     return *this;
 }

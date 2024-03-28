@@ -163,6 +163,14 @@ public:
     */
     double getTimeStamp() const noexcept                { return timeStamp; }
 
+    // BEATCONNECT MODIFICATION START
+    // Used for note animation
+    double getTimeInClip() const noexcept { return timeInClip; }
+    void setTimeInClip(double newTimeInClip) noexcept { timeInClip = newTimeInClip; }
+    int getEditItemID() const noexcept { return editItemID; }
+    void setEditItemID(int newEditItemID) noexcept { editItemID = newEditItemID; }
+    // BEATCONNECT MODIFICATION END
+
     /** Changes the message's associated timestamp.
         The units for the timestamp will be application-specific - see the notes for getTimeStamp().
         @see addToTimeStamp, getTimeStamp
@@ -976,6 +984,13 @@ private:
     PackedData packedData;
     double timeStamp = 0;
     int size;
+
+    // BEATCONNECT MODIFICATION START
+    // Used for note animation
+    double timeInClip = 0;
+    int editItemID = 0;
+    // BEATCONNECT MODIFICATION END
+
    #endif
 
     inline bool isHeapAllocated() const noexcept  { return size > (int) sizeof (packedData); }
