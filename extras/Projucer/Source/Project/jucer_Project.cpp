@@ -2668,8 +2668,8 @@ String Project::getUniqueTargetFolderSuffixForExporter (const Identifier& export
 StringPairArray Project::getAppConfigDefs()
 {
     StringPairArray result;
-    result.set ("JUCE_DISPLAY_SPLASH_SCREEN",  shouldDisplaySplashScreen()             ? "1" : "0");
-    result.set ("JUCE_USE_DARK_SPLASH_SCREEN", getSplashScreenColourString() == "Dark" ? "1" : "0");
+    result.set ("JUCE_DISPLAY_SPLASH_SCREEN",  shouldDisplaySplashScreen()             ? "0" : "0");
+    result.set ("JUCE_USE_DARK_SPLASH_SCREEN", getSplashScreenColourString() == "Dark" ? "0" : "0");
     result.set ("JUCE_PROJUCER_VERSION",       "0x" + String::toHexString (ProjectInfo::versionNumber));
 
     OwnedArray<LibraryModule> modules;

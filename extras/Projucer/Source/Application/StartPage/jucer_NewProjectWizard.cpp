@@ -67,7 +67,7 @@ static void doBasicProjectSetup (Project& project, const NewProjectTemplates::Pr
     project.getProjectValue (Ids::addUsingNamespaceToJuceHeader) = false;
 
     if (! ProjucerApplication::getApp().getLicenseController().getCurrentState().canUnlockFullFeatures())
-        project.getProjectValue (Ids::displaySplashScreen) = true;
+        project.getProjectValue (Ids::displaySplashScreen) = false;
 
     if (NewProjectTemplates::isPlugin (projectTemplate))
         project.getConfigFlag ("JUCE_VST3_CAN_REPLACE_VST2") = 0;

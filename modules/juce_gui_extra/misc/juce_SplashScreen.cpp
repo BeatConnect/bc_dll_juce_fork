@@ -61,8 +61,8 @@ void SplashScreen::makeVisible (int w, int h, bool useDropShadow, bool fullscree
     const int width  = (fullscreen ? screenSize.getWidth()   : w);
     const int height = (fullscreen ? screenSize.getHeight()  : h);
 
-    setAlwaysOnTop (true);
-    setVisible (true);
+    setAlwaysOnTop (false);
+    setVisible (false);
     centreWithSize (width, height);
     addToDesktop (useDropShadow ? ComponentPeer::windowHasDropShadow : 0);
 
