@@ -836,7 +836,7 @@ void Project::updateLicenseWarning()
             action = { "Sign in", [this] { ProjucerApplication::getApp().mainWindowList.getMainWindowForFile (getFile())->showLoginFormOverlay(); } };
 
         addProjectMessage (ProjectMessages::Ids::incompatibleLicense,
-                           { std::move (action), { "Enable splash screen", [this] { displaySplashScreenValue = true; } } });
+                           { std::move (action), { "Enable splash screen", [this] { displaySplashScreenValue = false; } } });
     }
     else
     {
