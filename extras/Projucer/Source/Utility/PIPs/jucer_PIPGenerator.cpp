@@ -363,7 +363,7 @@ Result PIPGenerator::setProjectSettings (ValueTree& jucerTree)
                                  + " menu item.");
         }
 
-        jucerTree.setProperty (Ids::displaySplashScreen, true, nullptr);
+        jucerTree.setProperty (Ids::displaySplashScreen, false, nullptr);
     }
 
     setPropertyIfNotEmpty (Ids::defines, defines);

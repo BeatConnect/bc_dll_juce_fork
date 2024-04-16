@@ -42,14 +42,14 @@ SplashScreen::SplashScreen (const String& title, const Image& image, bool useDro
     const bool useFullScreen = false;
    #endif
 
-    makeVisible (image.getWidth(), image.getHeight(), useDropShadow, useFullScreen);
+    // makeVisible (image.getWidth(), image.getHeight(), useDropShadow, useFullScreen);
 }
 
 SplashScreen::SplashScreen (const String& title, int width, int height, bool useDropShadow)
     : Component (title),
       clickCountToDelete (0)
 {
-    makeVisible (width, height, useDropShadow, false);
+    // makeVisible (width, height, useDropShadow, false);
 }
 
 void SplashScreen::makeVisible (int w, int h, bool useDropShadow, bool fullscreen)
@@ -61,8 +61,8 @@ void SplashScreen::makeVisible (int w, int h, bool useDropShadow, bool fullscree
     const int width  = (fullscreen ? screenSize.getWidth()   : w);
     const int height = (fullscreen ? screenSize.getHeight()  : h);
 
-    setAlwaysOnTop (true);
-    setVisible (true);
+    setAlwaysOnTop (false);
+    setVisible (false);
     centreWithSize (width, height);
     addToDesktop (useDropShadow ? ComponentPeer::windowHasDropShadow : 0);
 
