@@ -42,11 +42,11 @@ namespace juce
 // BEGIN SECTION A
 
 #if ! defined (JUCE_DISPLAY_SPLASH_SCREEN)
- #define JUCE_DISPLAY_SPLASH_SCREEN 1
+ #define JUCE_DISPLAY_SPLASH_SCREEN 0
 #endif
 
 #if ! defined (JUCE_USE_DARK_SPLASH_SCREEN)
- #define JUCE_USE_DARK_SPLASH_SCREEN 1
+ #define JUCE_USE_DARK_SPLASH_SCREEN 0
 #endif
 
 static constexpr int millisecondsToDisplaySplash = 2000, splashScreenFadeOutTime = 2000,
@@ -72,7 +72,7 @@ JUCESplashScreen::JUCESplashScreen (Component& parent)
     {
         content = getSplashScreenLogo();
 
-        setAlwaysOnTop (true);
+        setAlwaysOnTop (false);
         parent.addAndMakeVisible (this);
     }
     else
