@@ -66,22 +66,22 @@ JUCESplashScreen::JUCESplashScreen (Component& parent)
 {
     ignoreUnused (parent);
 
-   #if JUCE_DISPLAY_SPLASH_SCREEN
-    if (splashDisplayTime == 0
-         || Time::getMillisecondCounter() < splashDisplayTime + (uint32) millisecondsToDisplaySplash)
-    {
-        content = getSplashScreenLogo();
-
-        setAlwaysOnTop (false);
-        parent.addAndMakeVisible (this);
-    }
-    else
-   #endif
-    {
-        startTimer (1);
-    }
-
-    setAccessible (false);
+//   #if JUCE_DISPLAY_SPLASH_SCREEN
+//    if (splashDisplayTime == 0
+//         || Time::getMillisecondCounter() < splashDisplayTime + (uint32) millisecondsToDisplaySplash)
+//    {
+//        content = getSplashScreenLogo();
+//
+//        setAlwaysOnTop (false);
+//        parent.addAndMakeVisible (this);
+//    }
+//    else
+//   #endif
+//    {
+//        startTimer (1);
+//    }
+//
+//    setAccessible (false);
 }
 
 std::unique_ptr<Drawable> JUCESplashScreen::getSplashScreenLogo()
