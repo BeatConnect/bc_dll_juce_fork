@@ -153,6 +153,14 @@ public:
         }
     }
 
+    // BEATCONNECT MODIFICATION START
+    void forceProperty(const Identifier& name, const var& newValue)
+    {
+        if (properties.force(name, newValue))
+            sendPropertyChangeMessage(name, nullptr);
+    }
+    // BEATCONNECT MODIFICATION END
+
     bool hasProperty (const Identifier& name) const noexcept
     {
         return properties.contains (name);
@@ -775,6 +783,19 @@ ValueTree& ValueTree::setProperty (const Identifier& name, const var& newValue, 
 {
     return setPropertyExcludingListener (nullptr, name, newValue, undoManager);
 }
+
+// BEATCONNECT MODIFICATION START
+ValueTree& ValueTree::forceProperty(const Identifier& name, const var& newValue)
+{
+    jassert(name.toString().isNotEmpty()); // Must have a valid property name!
+    jassert(object != nullptr); // Trying to add a property to a null ValueTree will fail!
+
+    if (object != nullptr)
+        object->forceProperty(name, newValue);
+
+    return *this;
+}
+// BEATCONNECT MODIFICATION END
 
 ValueTree& ValueTree::setPropertyExcludingListener (Listener* listenerToExclude, const Identifier& name,
                                                     const var& newValue, UndoManager* undoManager)

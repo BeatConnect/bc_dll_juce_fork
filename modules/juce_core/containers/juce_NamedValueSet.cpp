@@ -195,6 +195,20 @@ bool NamedValueSet::set (const Identifier& name, const var& newValue)
     return true;
 }
 
+// BEATCONNECT MODIFICATION START
+bool NamedValueSet::force(const Identifier& name, const var& newValue)
+{
+    if (auto* v = getVarPointer(name))
+    {
+        *v = newValue;
+        return true;
+    }
+
+    values.add({ name, newValue });
+    return true;
+}
+// BEATCONNECT MODIFICATION END
+
 bool NamedValueSet::contains (const Identifier& name) const noexcept
 {
     return getVarPointer (name) != nullptr;

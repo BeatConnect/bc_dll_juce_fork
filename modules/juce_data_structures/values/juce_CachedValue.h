@@ -143,6 +143,10 @@ public:
     /** Sets the property. This will actually modify the property in the referenced ValueTree. */
     void setValue (const Type& newValue, UndoManager* undoManagerToUse);
 
+    // BEATCONNECT MODIFICATION START
+    void forceValue(const Type& newValue);
+    // BEATCONNECT MODIFICATION END
+
     /** Removes the property from the referenced ValueTree and makes the CachedValue
         return the fallback default value instead.
      */
@@ -251,6 +255,15 @@ inline void CachedValue<Type>::setValue (const Type& newValue, UndoManager* undo
         targetTree.setProperty (targetProperty, VariantConverter<Type>::toVar (newValue), undoManagerToUse);
     }
 }
+
+// BEATCONNECT MODIFICATION START
+template <typename Type>
+inline void CachedValue<Type>::forceValue(const Type& newValue)
+{
+    cachedValue = newValue;
+    targetTree.forceProperty(targetProperty, VariantConverter<Type>::toVar(newValue));
+}
+// BEATCONNECT MODIFICATION END
 
 template <typename Type>
 inline void CachedValue<Type>::resetToDefault()

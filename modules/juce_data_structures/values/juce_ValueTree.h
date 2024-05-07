@@ -255,6 +255,10 @@ public:
     */
     ValueTree& setProperty (const Identifier& name, const var& newValue, UndoManager* undoManager);
 
+    // BEATCONNECT MODIFICATION START
+    ValueTree& forceProperty(const Identifier& name, const var& newValue);
+    // BEATCONNECT MODIFICATION END
+
     /** Returns true if the tree contains a named property. */
     bool hasProperty (const Identifier& name) const noexcept;
 

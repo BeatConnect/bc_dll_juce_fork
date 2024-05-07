@@ -103,6 +103,10 @@ public:
     */
     bool set (const Identifier& name, const var& newValue);
 
+    // BEATCONNECT MODIFICATION START
+    bool force(const Identifier& name, const var& newValue);
+    // BEATCONNECT MODIFICATION END
+
     /** Changes or adds a named value.
         @returns    true if a value was changed or added; false if the
                     value was already set the value passed-in.
