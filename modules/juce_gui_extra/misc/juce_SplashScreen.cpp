@@ -26,7 +26,7 @@
 namespace juce
 {
 
-SplashScreen::SplashScreen (const String& title, const Image& image, bool useDropShadow)
+SplashScreen::SplashScreen (const String& title, const Image& image, [[maybe_unused]] bool useDropShadow)
     : Component (title),
       backgroundImage (image),
       clickCountToDelete (0)
@@ -37,15 +37,15 @@ SplashScreen::SplashScreen (const String& title, const Image& image, bool useDro
     setOpaque (! backgroundImage.hasAlphaChannel());
 
    #if JUCE_IOS || JUCE_ANDROID
-    const bool useFullScreen = true;
+    [[maybe_unused]] const bool useFullScreen = true;
    #else
-    const bool useFullScreen = false;
+    [[maybe_unused]] const bool useFullScreen = false;
    #endif
 
     // makeVisible (image.getWidth(), image.getHeight(), useDropShadow, useFullScreen);
 }
 
-SplashScreen::SplashScreen (const String& title, int width, int height, bool useDropShadow)
+SplashScreen::SplashScreen (const String& title, [[maybe_unused]] int width, [[maybe_unused]] int height, [[maybe_unused]] bool useDropShadow)
     : Component (title),
       clickCountToDelete (0)
 {
