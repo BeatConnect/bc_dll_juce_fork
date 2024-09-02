@@ -26,6 +26,7 @@
 namespace juce
 {
 
+#include <functional>
 //==============================================================================
 /**
     A component displaying a list of plugins, with options to scan for them,
@@ -96,6 +97,10 @@ public:
     /** Removes the plugins currently selected in the table. */
     void removeSelectedPlugins();
 
+    // BEATCONNECT MODIFICATION START
+    void setScanCompleteCallback(std::function<void()> callback) { scanCompleteCallback = callback; }
+    // BEATCONNECT MODIFICATION ENBD
+
     /** Sets a custom table model to be used.
         This will take ownership of the model and delete it when no longer needed.
      */
@@ -138,6 +143,10 @@ private:
     bool isInterestedInFileDrag (const StringArray&) override;
     void filesDropped (const StringArray&, int, int) override;
     void changeListenerCallback (ChangeBroadcaster*) override;
+
+    // BEATOCNNECT MODIFICATION START
+    std::function<void()> scanCompleteCallback;
+    // BEATOCNNECT MODIFICATION END
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginListComponent)
 };

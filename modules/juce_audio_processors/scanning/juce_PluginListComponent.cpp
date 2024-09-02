@@ -226,6 +226,11 @@ void PluginListComponent::changeListenerCallback (ChangeBroadcaster*)
 {
     table.getHeader().reSortTable();
     updateList();
+    
+    // BEATCONNECT MODIFICATION START
+    if (scanCompleteCallback)
+        scanCompleteCallback();
+    // BEATCONNECT MODIFICATION END
 }
 
 void PluginListComponent::updateList()
