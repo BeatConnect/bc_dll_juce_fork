@@ -124,6 +124,7 @@ private:
     File deadMansPedalFile;
     TableListBox table;
     TextButton optionsButton;
+    TextButton scanButton;
     PropertiesFile* propertiesToUse;
     String dialogTitle, dialogText;
     bool allowAsync;

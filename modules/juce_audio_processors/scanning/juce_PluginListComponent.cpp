@@ -147,6 +147,7 @@ PluginListComponent::PluginListComponent (AudioPluginFormatManager& manager, Kno
       list (listToEdit),
       deadMansPedalFile (deadMansPedal),
       optionsButton ("Options..."),
+      scanButton("Scan"),
       propertiesToUse (props),
       allowAsync (allowPluginsWhichRequireAsynchronousInstantiation),
       numThreads (allowAsync ? 1 : 0)
@@ -176,6 +177,22 @@ PluginListComponent::PluginListComponent (AudioPluginFormatManager& manager, Kno
     };
 
     optionsButton.setTriggeredOnMouseDown (true);
+
+    // BEATCONNECT MODIFICATION START
+    addAndMakeVisible(scanButton);
+    scanButton.onClick = [this]
+    {
+        for (auto f : formatManager.getFormats())
+        {
+            if (f->getName() == "VST3")
+            {
+                scanFor(*f);
+                break;
+            }
+        }
+    };
+    scanButton.setTriggeredOnMouseDown(true);
+    // BEATCONNECT MODIFICATION END
 
     setSize (400, 600);
     list.addChangeListener (this);
@@ -212,12 +229,21 @@ void PluginListComponent::resized()
 {
     auto r = getLocalBounds().reduced (2);
 
+    // BEATCONNECT MODIFICATION START
+    if (scanButton.isVisible())
+    {
+        scanButton.setBounds(r.removeFromBottom(24));
+        scanButton.changeWidthToFitText(24);
+    }
+
     if (optionsButton.isVisible())
     {
-        optionsButton.setBounds (r.removeFromBottom (24));
-        optionsButton.changeWidthToFitText (24);
-        r.removeFromBottom (3);
+        auto scanBounds = scanButton.getBounds();
+        scanBounds.setX(scanBounds.getRight() + 8);
+        optionsButton.setBounds(scanBounds);
+        optionsButton.changeWidthToFitText(24);
     }
+    // BEATCONNECT MODIFICATION END
 
     table.setBounds (r);
 }
