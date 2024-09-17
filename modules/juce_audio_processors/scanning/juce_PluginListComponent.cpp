@@ -252,11 +252,6 @@ void PluginListComponent::changeListenerCallback (ChangeBroadcaster*)
 {
     table.getHeader().reSortTable();
     updateList();
-    
-    // BEATCONNECT MODIFICATION START
-    if (scanCompleteCallback)
-        scanCompleteCallback();
-    // BEATCONNECT MODIFICATION END
 }
 
 void PluginListComponent::updateList()
@@ -321,7 +316,14 @@ PopupMenu PluginListComponent::createOptionsMenu()
 {
     PopupMenu menu;
     menu.addItem (PopupMenu::Item (TRANS("Clear list"))
-                    .setAction ([this] { list.clear(); }));
+                    .setAction ([this] 
+    { 
+        list.clear(); 
+        // BEATCONNECT MODIFICATION START
+        if (scanCompleteCallback)
+            scanCompleteCallback();
+        // BEATCONNECT MODIFICATION END
+    }));
 
     menu.addSeparator();
 
@@ -706,6 +708,10 @@ void PluginListComponent::scanFinished (const StringArray& failedFiles,
         AlertWindow::showMessageBoxAsync (MessageBoxIconType::InfoIcon,
                                           TRANS("Scan complete"),
                                           warnings.joinIntoString ("\n\n"));
+    // BEATCONNECT MODIFICATION START
+    if (scanCompleteCallback)
+        scanCompleteCallback();
+    // BEATCONNECT MODIFICATION END
 }
 
 } // namespace juce
