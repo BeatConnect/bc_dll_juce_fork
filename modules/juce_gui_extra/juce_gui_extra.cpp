@@ -131,7 +131,7 @@
 #include "misc/juce_PreferencesPanel.cpp"
 #include "misc/juce_PushNotifications.cpp"
 #include "misc/juce_RecentlyOpenedFilesList.cpp"
-#include "misc/juce_SplashScreen.cpp"
+// #include "misc/juce_SplashScreen.cpp"
 #include "misc/juce_SystemTrayIconComponent.cpp"
 #include "misc/juce_LiveConstantEditor.cpp"
 #include "misc/juce_AnimatedAppComponent.cpp"

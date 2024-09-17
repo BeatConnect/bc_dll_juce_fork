@@ -63,11 +63,11 @@ static void doBasicProjectSetup (Project& project, const NewProjectTemplates::Pr
     project.getMainGroup().addNewSubGroup ("Source", 0);
 
     project.getConfigFlag ("JUCE_STRICT_REFCOUNTEDPOINTER") = true;
-    project.getProjectValue (Ids::useAppConfig) = false;
+    project.getProjectValue (Ids::useAppCÏonfig) = false;
     project.getProjectValue (Ids::addUsingNamespaceToJuceHeader) = false;
 
     if (! ProjucerApplication::getApp().getLicenseController().getCurrentState().canUnlockFullFeatures())
-        project.getProjectValue (Ids::displaySplashScreen) = true;
+        project.getProjectValue (Ids::displaySplashScreen) = false;
 
     if (NewProjectTemplates::isPlugin (projectTemplate))
         project.getConfigFlag ("JUCE_VST3_CAN_REPLACE_VST2") = 0;
