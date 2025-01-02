@@ -696,8 +696,28 @@ private:
             sampleRateDropDown->addItem (getFrequencyString (intRate), intRate);
         }
 
-        const auto intRate = roundToInt (currentDevice->getCurrentSampleRate());
-        sampleRateDropDown->setText (getFrequencyString (intRate), dontSendNotification);
+        // BEATCONNECT MODIFICATION START
+        const auto intRate = roundToInt(currentDevice->getCurrentSampleRate());
+
+        auto rates = currentDevice->getAvailableSampleRates();
+        bool isIn = rates.contains(currentDevice->getCurrentSampleRate());
+        if (!isIn)
+        {
+            // assert(false);
+            sampleRateDropDown->setSelectedItemIndex(0);
+            std::ostringstream oss;
+            oss << "The current sample rate (" << getFrequencyString(intRate) << ") is not in the current device sample rate list.";
+            AlertWindow::showMessageBoxAsync(
+                MessageBoxIconType::WarningIcon,
+                TRANS("Error when trying to select sample rate!"),
+                oss.str());
+        }
+        else
+            sampleRateDropDown->setText(getFrequencyString(intRate), dontSendNotification);
+
+        //  const auto intRate = roundToInt (currentDevice->getCurrentSampleRate());
+        //  sampleRateDropDown->setText (getFrequencyString (intRate), dontSendNotification);
+        // BEATCONNECT MODIFICATION START
 
         sampleRateDropDown->onChange = [this] { updateConfig (false, false, true, false); };
     }
