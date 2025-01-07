@@ -582,7 +582,14 @@ private:
         JUCE_COMRESULT OnSessionDisconnected (AudioSessionDisconnectReason reason)
         {
             if (reason == DisconnectReasonFormatChanged)
+            {
+                // BEATCONNET MODIFICATION START
+                // This is to fix the bug where the JUCE sample rate in the Audio Settings are not updated when the sample rate is changed in Windows Audio Settings.
+                owner.deviceSessionBecameActive();
+                // BEATCONNET MODIFICATION END
+
                 owner.deviceSampleRateChanged();
+            }
 
             return S_OK;
         }
