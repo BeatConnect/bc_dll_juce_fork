@@ -425,10 +425,22 @@ String AudioDeviceManager::initialiseFromXML (const XmlElement& xml,
     setup.sampleRate = xml.getDoubleAttribute ("audioDeviceRate", setup.sampleRate);
 
     setup.inputChannels .parseString (xml.getStringAttribute ("audioDeviceInChans",  "11"), 2);
-    setup.outputChannels.parseString (xml.getStringAttribute ("audioDeviceOutChans", "11"), 2);
+
+    // BEATCONNECT MODIFICATION START
+    // We force stereo output (2 channels only)
+    // In some cases, having more than 2 channels causes a crash with the Juce settings.
+    // setup.outputChannels.parseString (xml.getStringAttribute ("audioDeviceOutChans", "11"), 2);
+    setup.outputChannels.parseString ("11", 2);
+    // BEATCONNECT MODIFICATION START
 
     setup.useDefaultInputChannels  = ! xml.hasAttribute ("audioDeviceInChans");
-    setup.useDefaultOutputChannels = ! xml.hasAttribute ("audioDeviceOutChans");
+
+    // BEATCONNECT MODIFICATION START
+    // We force stereo output (2 channels only)
+    // In some cases, having more than 2 channels causes a crash with the Juce settings.
+    // setup.useDefaultOutputChannels = ! xml.hasAttribute ("audioDeviceOutChans");
+    setup.useDefaultOutputChannels = false;
+    // BEATCONNECT MODIFICATION END
 
     error = setAudioDeviceSetup (setup, true);
 
