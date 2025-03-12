@@ -1,21 +1,33 @@
 /*
   ==============================================================================
 
-   This file is part of the JUCE library.
-   Copyright (c) 2022 - Raw Material Software Limited
+   This file is part of the JUCE framework.
+   Copyright (c) Raw Material Software Limited
 
-   JUCE is an open source library subject to commercial or open-source
+   JUCE is an open source framework subject to commercial or open source
    licensing.
 
-   The code included in this file is provided under the terms of the ISC license
-   http://www.isc.org/downloads/software-support-policy/isc-license. Permission
-   To use, copy, modify, and/or distribute this software for any purpose with or
-   without fee is hereby granted provided that the above copyright notice and
-   this permission notice appear in all copies.
+   By downloading, installing, or using the JUCE framework, or combining the
+   JUCE framework with any other source code, object code, content or any other
+   copyrightable work, you agree to the terms of the JUCE End User Licence
+   Agreement, and all incorporated terms including the JUCE Privacy Policy and
+   the JUCE Website Terms of Service, as applicable, which will bind you. If you
+   do not agree to the terms of these agreements, we will not license the JUCE
+   framework to you, and you must discontinue the installation or download
+   process and cease use of the JUCE framework.
 
-   JUCE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL WARRANTIES, WHETHER
-   EXPRESSED OR IMPLIED, INCLUDING MERCHANTABILITY AND FITNESS FOR PURPOSE, ARE
-   DISCLAIMED.
+   JUCE End User Licence Agreement: https://juce.com/legal/juce-8-licence/
+   JUCE Privacy Policy: https://juce.com/juce-privacy-policy
+   JUCE Website Terms of Service: https://juce.com/juce-website-terms-of-service/
+
+   Or:
+
+   You may also use this code under the terms of the AGPLv3:
+   https://www.gnu.org/licenses/agpl-3.0.en.html
+
+   THE JUCE FRAMEWORK IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL
+   WARRANTIES, WHETHER EXPRESSED OR IMPLIED, INCLUDING WARRANTY OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED.
 
   ==============================================================================
 */
@@ -938,15 +950,13 @@ namespace
        #if JUCE_USE_VDSP_FRAMEWORK
         vDSP_vabs ((float*) src, 1, dest, 1, (vDSP_Length) num);
        #else
-        FloatVectorHelpers::signMask32 signMask;
+        [[maybe_unused]] FloatVectorHelpers::signMask32 signMask;
         signMask.i = 0x7fffffffUL;
         JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = std::abs (src[i]),
                                       Mode::bit_and (s, mask),
                                       JUCE_LOAD_SRC,
                                       JUCE_INCREMENT_SRC_DEST,
                                       const Mode::ParallelType mask = Mode::load1 (signMask.f);)
-
-        ignoreUnused (signMask);
        #endif
     }
 
@@ -956,7 +966,7 @@ namespace
        #if JUCE_USE_VDSP_FRAMEWORK
         vDSP_vabsD ((double*) src, 1, dest, 1, (vDSP_Length) num);
        #else
-        FloatVectorHelpers::signMask64 signMask;
+        [[maybe_unused]] FloatVectorHelpers::signMask64 signMask;
         signMask.i = 0x7fffffffffffffffULL;
 
         JUCE_PERFORM_VEC_OP_SRC_DEST (dest[i] = std::abs (src[i]),
@@ -964,8 +974,6 @@ namespace
                                       JUCE_LOAD_SRC,
                                       JUCE_INCREMENT_SRC_DEST,
                                       const Mode::ParallelType mask = Mode::load1 (signMask.d);)
-
-        ignoreUnused (signMask);
        #endif
     }
 
@@ -1456,7 +1464,7 @@ intptr_t JUCE_CALLTYPE FloatVectorOperations::getFpStatusRegister() noexcept
     return fpsr;
 }
 
-void JUCE_CALLTYPE FloatVectorOperations::setFpStatusRegister (intptr_t fpsr) noexcept
+void JUCE_CALLTYPE FloatVectorOperations::setFpStatusRegister ([[maybe_unused]] intptr_t fpsr) noexcept
 {
  #if JUCE_INTEL && JUCE_USE_SSE_INTRINSICS
     // the volatile keyword here is needed to workaround a bug in AppleClang 13.0
@@ -1481,11 +1489,10 @@ void JUCE_CALLTYPE FloatVectorOperations::setFpStatusRegister (intptr_t fpsr) no
   #if ! (defined (JUCE_INTEL) || defined (JUCE_ARM))
     jassertfalse; // No support for getting the floating point status register for your platform
   #endif
-    ignoreUnused (fpsr);
  #endif
 }
 
-void JUCE_CALLTYPE FloatVectorOperations::enableFlushToZeroMode (bool shouldEnable) noexcept
+void JUCE_CALLTYPE FloatVectorOperations::enableFlushToZeroMode ([[maybe_unused]] bool shouldEnable) noexcept
 {
   #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || (JUCE_64BIT && JUCE_ARM))
    #if JUCE_USE_SSE_INTRINSICS
@@ -1498,11 +1505,10 @@ void JUCE_CALLTYPE FloatVectorOperations::enableFlushToZeroMode (bool shouldEnab
    #if ! (defined (JUCE_INTEL) || defined (JUCE_ARM))
     jassertfalse; // No support for flush to zero mode on your platform
    #endif
-    ignoreUnused (shouldEnable);
   #endif
 }
 
-void JUCE_CALLTYPE FloatVectorOperations::disableDenormalisedNumberSupport (bool shouldDisable) noexcept
+void JUCE_CALLTYPE FloatVectorOperations::disableDenormalisedNumberSupport ([[maybe_unused]] bool shouldDisable) noexcept
 {
   #if JUCE_USE_SSE_INTRINSICS || (JUCE_USE_ARM_NEON || (JUCE_64BIT && JUCE_ARM))
    #if JUCE_USE_SSE_INTRINSICS
@@ -1513,7 +1519,6 @@ void JUCE_CALLTYPE FloatVectorOperations::disableDenormalisedNumberSupport (bool
 
     setFpStatusRegister ((getFpStatusRegister() & (~mask)) | (shouldDisable ? mask : 0));
   #else
-    ignoreUnused (shouldDisable);
 
    #if ! (defined (JUCE_INTEL) || defined (JUCE_ARM))
     jassertfalse; // No support for disable denormals mode on your platform
@@ -1562,7 +1567,7 @@ ScopedNoDenormals::~ScopedNoDenormals() noexcept
 //==============================================================================
 #if JUCE_UNIT_TESTS
 
-class FloatVectorOperationsTests  : public UnitTest
+class FloatVectorOperationsTests final : public UnitTest
 {
 public:
     FloatVectorOperationsTests()
@@ -1683,7 +1688,7 @@ public:
         static bool areAllValuesEqual (const ValueType* d, int num, ValueType target)
         {
             while (--num >= 0)
-                if (*d++ != target)
+                if (! exactlyEqual (*d++, target))
                     return false;
 
             return true;

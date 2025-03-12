@@ -1,24 +1,33 @@
 /*
   ==============================================================================
 
-   This file is part of the JUCE library.
-   Copyright (c) 2022 - Raw Material Software Limited
+   This file is part of the JUCE framework.
+   Copyright (c) Raw Material Software Limited
 
-   JUCE is an open source library subject to commercial or open-source
+   JUCE is an open source framework subject to commercial or open source
    licensing.
 
-   By using JUCE, you agree to the terms of both the JUCE 7 End-User License
-   Agreement and JUCE Privacy Policy.
+   By downloading, installing, or using the JUCE framework, or combining the
+   JUCE framework with any other source code, object code, content or any other
+   copyrightable work, you agree to the terms of the JUCE End User Licence
+   Agreement, and all incorporated terms including the JUCE Privacy Policy and
+   the JUCE Website Terms of Service, as applicable, which will bind you. If you
+   do not agree to the terms of these agreements, we will not license the JUCE
+   framework to you, and you must discontinue the installation or download
+   process and cease use of the JUCE framework.
 
-   End User License Agreement: www.juce.com/juce-7-licence
-   Privacy Policy: www.juce.com/juce-privacy-policy
+   JUCE End User Licence Agreement: https://juce.com/legal/juce-8-licence/
+   JUCE Privacy Policy: https://juce.com/juce-privacy-policy
+   JUCE Website Terms of Service: https://juce.com/juce-website-terms-of-service/
 
-   Or: You may also use this code under the terms of the GPL v3 (see
-   www.gnu.org/licenses).
+   Or:
 
-   JUCE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL WARRANTIES, WHETHER
-   EXPRESSED OR IMPLIED, INCLUDING MERCHANTABILITY AND FITNESS FOR PURPOSE, ARE
-   DISCLAIMED.
+   You may also use this code under the terms of the AGPLv3:
+   https://www.gnu.org/licenses/agpl-3.0.en.html
+
+   THE JUCE FRAMEWORK IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL
+   WARRANTIES, WHETHER EXPRESSED OR IMPLIED, INCLUDING WARRANTY OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED.
 
   ==============================================================================
 */
@@ -103,26 +112,6 @@ static const uint8 javaJuceOpenGLView[] =
 };
 
 //==============================================================================
-struct AndroidGLCallbacks
-{
-    static void attachedToWindow   (JNIEnv*, jobject, jlong);
-    static void detachedFromWindow (JNIEnv*, jobject, jlong);
-    static void dispatchDraw       (JNIEnv*, jobject, jlong, jobject);
-};
-
-//==============================================================================
-#define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
- METHOD (constructor, "<init>",    "(Landroid/content/Context;J)V") \
- METHOD (getParent,   "getParent", "()Landroid/view/ViewParent;") \
- METHOD (getHolder,   "getHolder", "()Landroid/view/SurfaceHolder;") \
- METHOD (layout,      "layout",    "(IIII)V" ) \
- CALLBACK (AndroidGLCallbacks::attachedToWindow,   "onAttchedWindowNative",      "(J)V") \
- CALLBACK (AndroidGLCallbacks::detachedFromWindow, "onDetachedFromWindowNative", "(J)V") \
- CALLBACK (AndroidGLCallbacks::dispatchDraw,       "onDrawNative",               "(JLandroid/graphics/Canvas;)V")
-
-DECLARE_JNI_CLASS_WITH_BYTECODE (JuceOpenGLViewSurface, "com/rmsl/juce/JuceOpenGLView", 16, javaJuceOpenGLView, sizeof(javaJuceOpenGLView))
-#undef JNI_CLASS_MEMBERS
-
 //==============================================================================
 class OpenGLContext::NativeContext : private SurfaceHolderCallback
 {
@@ -145,10 +134,10 @@ public:
             return;
 
         // create a native surface view
-        surfaceView = GlobalRef (LocalRef<jobject>(env->NewObject (JuceOpenGLViewSurface,
-                                                                   JuceOpenGLViewSurface.constructor,
-                                                                   getAppContext().get(),
-                                                                   reinterpret_cast<jlong> (this))));
+        surfaceView = GlobalRef (LocalRef<jobject> (env->NewObject (JuceOpenGLViewSurface,
+                                                                    JuceOpenGLViewSurface.constructor,
+                                                                    getAppContext().get(),
+                                                                    reinterpret_cast<jlong> (this))));
         if (surfaceView.get() == nullptr)
             return;
 
@@ -221,7 +210,7 @@ public:
 
     //==============================================================================
     void swapBuffers() const noexcept           { eglSwapBuffers (display, surface.get()); }
-    bool setSwapInterval (const int)            { return false; }
+    bool setSwapInterval (int)                  { return false; }
     int getSwapInterval() const                 { return 0; }
 
     //==============================================================================
@@ -246,9 +235,11 @@ public:
 
     //==============================================================================
     // Android Surface Callbacks:
-    void surfaceChanged (LocalRef<jobject> holder, int format, int width, int height) override
+    void surfaceChanged ([[maybe_unused]] LocalRef<jobject> holder,
+                         [[maybe_unused]] int format,
+                         [[maybe_unused]] int width,
+                         [[maybe_unused]] int height) override
     {
-        ignoreUnused (holder, format, width, height);
     }
 
     void surfaceCreated (LocalRef<jobject>) override;
@@ -264,40 +255,46 @@ public:
     Component& component;
 
 private:
+    #define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
+     METHOD (constructor, "<init>",    "(Landroid/content/Context;J)V") \
+     METHOD (getParent,   "getParent", "()Landroid/view/ViewParent;") \
+     METHOD (getHolder,   "getHolder", "()Landroid/view/SurfaceHolder;") \
+     METHOD (layout,      "layout",    "(IIII)V" ) \
+     CALLBACK (generatedCallback<&NativeContext::attachedToWindow>,   "onAttchedWindowNative",      "(J)V") \
+     CALLBACK (generatedCallback<&NativeContext::detachedFromWindow>, "onDetachedFromWindowNative", "(J)V") \
+     CALLBACK (generatedCallback<&NativeContext::dispatchDraw>,       "onDrawNative",               "(JLandroid/graphics/Canvas;)V")
+
+     DECLARE_JNI_CLASS_WITH_BYTECODE (JuceOpenGLViewSurface, "com/rmsl/juce/JuceOpenGLView", 16, javaJuceOpenGLView)
+    #undef JNI_CLASS_MEMBERS
+
     //==============================================================================
-    friend struct AndroidGLCallbacks;
-
-    void attachedToWindow()
+    static void attachedToWindow (JNIEnv* env, NativeContext& t)
     {
-        auto* env = getEnv();
+        LocalRef<jobject> holder (env->CallObjectMethod (t.surfaceView.get(), JuceOpenGLViewSurface.getHolder));
 
-        LocalRef<jobject> holder (env->CallObjectMethod (surfaceView.get(), JuceOpenGLViewSurface.getHolder));
+        if (t.surfaceHolderCallback == nullptr)
+            t.surfaceHolderCallback = GlobalRef (CreateJavaInterface (&t, "android/view/SurfaceHolder$Callback"));
 
-        if (surfaceHolderCallback == nullptr)
-            surfaceHolderCallback = GlobalRef (CreateJavaInterface (this, "android/view/SurfaceHolder$Callback"));
-
-        env->CallVoidMethod (holder, AndroidSurfaceHolder.addCallback, surfaceHolderCallback.get());
+        env->CallVoidMethod (holder, AndroidSurfaceHolder.addCallback, t.surfaceHolderCallback.get());
     }
 
-    void detachedFromWindow()
+    static void detachedFromWindow (JNIEnv* env, NativeContext& t)
     {
-        if (surfaceHolderCallback != nullptr)
+        if (t.surfaceHolderCallback != nullptr)
         {
-            auto* env = getEnv();
+            LocalRef<jobject> holder (env->CallObjectMethod (t.surfaceView.get(), JuceOpenGLViewSurface.getHolder));
 
-            LocalRef<jobject> holder (env->CallObjectMethod (surfaceView.get(), JuceOpenGLViewSurface.getHolder));
-
-            env->CallVoidMethod (holder.get(), AndroidSurfaceHolder.removeCallback, surfaceHolderCallback.get());
-            surfaceHolderCallback.clear();
+            env->CallVoidMethod (holder.get(), AndroidSurfaceHolder.removeCallback, t.surfaceHolderCallback.get());
+            t.surfaceHolderCallback.clear();
         }
     }
 
-    void dispatchDraw (jobject /*canvas*/)
+    static void dispatchDraw (JNIEnv*, NativeContext& t, jobject /*canvas*/)
     {
-        const std::lock_guard lock { nativeHandleMutex };
+        const std::lock_guard lock { t.nativeHandleMutex };
 
-        if (juceContext != nullptr)
-            juceContext->triggerRepaint();
+        if (t.juceContext != nullptr)
+            t.juceContext->triggerRepaint();
     }
 
     bool tryChooseConfig (const std::vector<EGLint>& optionalAttribs)
@@ -411,25 +408,6 @@ private:
 
 EGLDisplay OpenGLContext::NativeContext::display = EGL_NO_DISPLAY;
 EGLDisplay OpenGLContext::NativeContext::config;
-
-//==============================================================================
-void AndroidGLCallbacks::attachedToWindow (JNIEnv*, jobject /*this*/, jlong host)
-{
-    if (auto* nativeContext = reinterpret_cast<OpenGLContext::NativeContext*> (host))
-        nativeContext->attachedToWindow();
-}
-
-void AndroidGLCallbacks::detachedFromWindow (JNIEnv*, jobject /*this*/, jlong host)
-{
-    if (auto* nativeContext = reinterpret_cast<OpenGLContext::NativeContext*> (host))
-        nativeContext->detachedFromWindow();
-}
-
-void AndroidGLCallbacks::dispatchDraw (JNIEnv*, jobject /*this*/, jlong host, jobject canvas)
-{
-    if (auto* nativeContext = reinterpret_cast<OpenGLContext::NativeContext*> (host))
-        nativeContext->dispatchDraw (canvas);
-}
 
 //==============================================================================
 bool OpenGLHelpers::isContextActive()
