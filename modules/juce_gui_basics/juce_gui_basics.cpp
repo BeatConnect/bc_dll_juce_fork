@@ -272,7 +272,7 @@ namespace juce
 #include "misc/juce_BubbleComponent.cpp"
 #include "misc/juce_DropShadower.cpp"
 #include "misc/juce_FocusOutline.cpp"
-#include "misc/juce_JUCESplashScreen.cpp"
+// #include "misc/juce_JUCESplashScreen.cpp"
 
 #include "layout/juce_FlexBox.cpp"
 #include "layout/juce_GridItem.cpp"
